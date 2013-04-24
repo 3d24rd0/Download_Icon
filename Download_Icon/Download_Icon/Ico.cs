@@ -1,4 +1,8 @@
 ﻿using System;
+using System.IO;
+using System.Net;
+using System.Text.RegularExpressions;
+using System.Windows;
 using System.Windows.Media.Imaging;
 
 namespace Download_Icon
@@ -13,16 +17,59 @@ namespace Download_Icon
             this.ruta = ruta;
             Dowload_ico();
         }
+
         private void Dowload_ico()
         {
+            string rutatemp;
             Uri a = new Uri(ruta, UriKind.RelativeOrAbsolute);
             host = a.Host;
             System.Windows.Media.Imaging.BitmapImage temp = new System.Windows.Media.Imaging.BitmapImage();
-            ruta = ruta + "/favicon.ico";
-            temp.BeginInit();
-            temp.UriSource = new Uri(ruta, UriKind.RelativeOrAbsolute);
-            temp.EndInit();
-            imagen = temp;
+                using (WebClient client = new WebClient())
+                {
+                    string htmlCode = client.DownloadString(a);
+                    String patch = null;
+                    String urlaux = null;
+                    foreach (Match match in Regex.Matches(htmlCode, "<base href=\"(.*?.*)\""))
+                    {
+                        urlaux = match.Groups[1].Value;
+                    }
+                    int cont = 0;
+                    foreach (Match match in Regex.Matches(htmlCode, "<link rel=\"shortcut icon\" href=\"(.*?.*)\""))
+                    {
+                        patch = match.Groups[1].Value;
+                        if (patch.StartsWith("http"))
+                        {
+                            rutatemp = patch;
+                        }
+                        else 
+                        {
+                            if (urlaux != null)
+                            {
+                                rutatemp = urlaux + "/" + patch;
+                            }
+                            else
+                            {
+                                rutatemp = ruta + "/" + patch;
+                            }
+                        }
+                        a = new Uri(rutatemp, UriKind.RelativeOrAbsolute);
+                        temp.BeginInit();
+                        temp.DecodePixelWidth = 30;
+                        temp.UriSource = a;
+                        temp.EndInit();
+                        cont++;
+                    }
+
+                    if (cont == 0)
+                    {
+                        rutatemp = ruta + "/favicon.ico";
+                        temp.BeginInit();
+                        temp.UriSource = new Uri(rutatemp, UriKind.RelativeOrAbsolute);
+                        temp.EndInit();
+                    }
+                 }
+
+             imagen = temp;
         }
     }
 }

@@ -21,6 +21,7 @@ namespace Download_Icon
         {
             temp = new Ico(url.Text);
             icono.Source = temp.imagen;
+            this.Icon = temp.imagen;
         }
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
@@ -36,6 +37,7 @@ namespace Download_Icon
                         TiffBitmapEncoder encoder5 = new TiffBitmapEncoder();
                         encoder5.Frames.Add(BitmapFrame.Create(temp.imagen));
                         encoder5.Save(stream5);
+                        stream5.Close();
                     }
         }
 
