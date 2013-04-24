@@ -1,4 +1,4 @@
 Download_Icon
 =============
 
-Descarga el icono de una pagina web
+Descarga el icono/favicon de cualquier pagina web.
