@@ -21,6 +21,14 @@ namespace Download_Icon
         private void Dowload_ico()
         {
             string rutatemp;
+            if (ruta.StartsWith("http"))
+            {
+                this.ruta = ruta;
+            }
+            else
+            {
+                this.ruta = "http://" + ruta;
+            }
             Uri a = new Uri(ruta, UriKind.RelativeOrAbsolute);
             host = a.Host;
             System.Windows.Media.Imaging.BitmapImage temp = new System.Windows.Media.Imaging.BitmapImage();
@@ -59,7 +67,34 @@ namespace Download_Icon
                         temp.EndInit();
                         cont++;
                     }
-
+                    if (cont == 0)
+                    {
+                        foreach (Match match in Regex.Matches(htmlCode, "<link rel=\"icon\" href=\"(.*?.*)\""))
+                        {
+                            patch = match.Groups[1].Value;
+                            if (patch.StartsWith("http"))
+                            {
+                                rutatemp = patch;
+                            }
+                            else
+                            {
+                                if (urlaux != null)
+                                {
+                                    rutatemp = urlaux + "/" + patch;
+                                }
+                                else
+                                {
+                                    rutatemp = ruta + "/" + patch;
+                                }
+                            }
+                            a = new Uri(rutatemp, UriKind.RelativeOrAbsolute);
+                            temp.BeginInit();
+                            temp.DecodePixelWidth = 30;
+                            temp.UriSource = a;
+                            temp.EndInit();
+                            cont++;
+                        }
+                    }
                     if (cont == 0)
                     {
                         rutatemp = ruta + "/favicon.ico";
